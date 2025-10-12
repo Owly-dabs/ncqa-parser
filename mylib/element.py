@@ -65,6 +65,9 @@ def get_scoring(element_body:str) -> str:
             }
         }
     """
+    if element_body.startswith("Not Applicable"):
+        return ""
+    
     text = get_scoring_text(element_body)
     formatted_text = format_scoring(text)
     return formatted_text
@@ -88,12 +91,12 @@ def get_scoring_text(element_body: str) -> str:
         ValueError: If no 'Scoring' section is found in the text.
     """
     pattern = re.compile(
-        r"(?ms)^Scoring\s*(.*?)^(?:Data source|Scope of|Documentation|Look-back|Explanation|Factor\s+\d+:|Exceptions|Related information|Examples|$)"
+        r"(?ms)^Scoring\s*(.*?)^(?:Data|Scope of|Documentation|Look-back|Explanation|Factor\s+\d+:|Exceptions|Related information|Examples|$)"
     )
 
     match = pattern.search(element_body)
     if not match:
-        raise ValueError("❌ No 'Scoring' section found in the provided element body.")
+        raise ValueError(f"❌ No 'Scoring' section found in the provided element body. Text: {element_body}")
 
     scoring_text = match.group(1).strip()
     return scoring_text
@@ -134,13 +137,16 @@ def format_scoring(scoring_text: str) -> str:
         raise ValueError("❌ No scoring descriptions found after category headers.")
 
     # Find all lines that begin with "The organization" or "No scoring"
+    # pattern = re.compile(
+    #     r"(?m)^(The organization.*|The description.*|The file.*|No scoring.*|An average.*|High.*|Medium.*|Low.*)",
+    #     re.IGNORECASE
+    # )
     pattern = re.compile(
-        r"(?m)^(The organization.*|The description.*|No scoring.*|An average.*|High.*|Medium.*|Low.*)",
-        re.IGNORECASE
+        r"(?m)^([A-Z].*)"
     )
     matches = list(pattern.finditer(desc_block))
 
-    if len(matches) < 3:
+    if len(matches) != 3:
         raise ValueError(
             f"❌ Expected 3 scoring descriptions, but found {len(matches)}. Text:\n{desc_block[:300]}"
         )
@@ -191,6 +197,9 @@ def get_data_source(element_body: str) -> list[str]:
     Raises:
         ValueError: If 'Data source' or its corresponding line cannot be found.
     """
+    if element_body.startswith("Not Applicable"):
+        return ""
+    
     lines = [line.strip() for line in element_body.splitlines() if line.strip()]
 
     for i, line in enumerate(lines):
@@ -200,8 +209,15 @@ def get_data_source(element_body: str) -> list[str]:
             next_line = lines[i + 1]
             # Split by comma and strip extra spaces
             return [src.strip() for src in next_line.split(",") if src.strip()]
+        
+        elif line.lower() == "data":
+            if i + 2 >= len(lines):
+                raise ValueError("❌ Found 'Data source' but no following line.")
+            next_line = lines[i + 2]
+            # Split by comma and strip extra spaces
+            return [src.strip() for src in next_line.split(",") if src.strip()]
 
-    raise ValueError("❌ 'Data source' not found in element body.")
+    raise ValueError(f"❌ 'Data source' not found in element body. Text: {element_body}")
 
 
 def get_explanation(element_body: str) -> str:
@@ -220,11 +236,14 @@ def get_explanation(element_body: str) -> str:
     Raises:
         ValueError: If 'Explanation' or the section text is not found.
     """
+    if element_body.startswith("Not Applicable"):
+        return element_body
+    
     pattern = re.compile(r"(?ms)^Explanation\s*(.*?)^Examples\s*\n", re.IGNORECASE)
 
     match = pattern.search(element_body)
     if not match:
-        raise ValueError("❌ Could not find 'Explanation' section in element body.")
+        raise ValueError(f"❌ Could not find 'Explanation' section in element body. Text: {element_body}")
 
     explanation_text = match.group(1).strip()
     if not explanation_text:
@@ -247,6 +266,9 @@ def get_factors_text(element_body: str) -> str:
     Raises:
         ValueError: If 'Summary of Changes' is not found.
     """
+    if element_body.startswith("Not Applicable"):
+        return ""
+    
     pattern = re.compile(r"(?ms)^(.*?)(?=^Summary of Changes)", re.IGNORECASE)
     match = pattern.search(element_body)
 
