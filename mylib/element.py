@@ -134,7 +134,7 @@ def format_scoring(scoring_text: str) -> str:
         raise ValueError("❌ No scoring descriptions found after category headers.")
 
     # Find all lines that begin with "The organization" or "No scoring"
-    pattern = re.compile(r"(?m)^(The organization.*|No scoring.*)", re.IGNORECASE)
+    pattern = re.compile(r"(?m)^(The organization.*|No scoring.*|An average.*)", re.IGNORECASE)
     matches = list(pattern.finditer(desc_block))
 
     if len(matches) < 3:
