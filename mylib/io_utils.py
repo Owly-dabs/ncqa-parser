@@ -20,6 +20,12 @@ def read_pdf_pages(pdf_path) -> list[str]:
     return pages
 
     
+def read_page(pdf_path:str, page: int) -> str:
+    with fitz.open(pdf_path) as doc:
+        text = doc[page+1].get_text("text").strip()
+    return text
+
+    
 def clear_csv(file_path: str, header=False):
     """
     Clears a csv file. Leaves the header by default
