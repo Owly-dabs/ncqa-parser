@@ -284,7 +284,7 @@ def element_to_factors(element_body:str) -> list[Factor]:
     num_factors = factor.get_num_factors(element_factors)
     if num_factors == 0:
         print(f"No factors in {element_body[:100]}...")
-        pass #TODO: Make functions for elements with no factors
+        pass 
     
     factors: list[Factor] = []
     element_explanation = get_explanation(element_body)
