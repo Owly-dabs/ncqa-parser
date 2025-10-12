@@ -171,13 +171,15 @@ def get_explanation(element_explanation: str, index: int) -> str:
 
     # Match "Factor"/"Factors" blocks (with or without colon)
     pattern = re.compile(
-        r"(?ms)^Factors?\s+([\d,\-–—\s]+)(?::[^\n]*)?\n(.*?)(?=^Factors?\s+\d|^Exceptions|^Related information|\Z)",
+        r"(?ms)^Factors?\s+([\d,\-–—\s]+)(?::[^\n]*)?\n(.*?)(?=^Factors?\s+\d|^Exceptions?|^Related information|\Z)",
         re.IGNORECASE,
     )
 
     matches = pattern.findall(text)
     if not matches:
-        raise ValueError(f"❌ No factor explanation sections found for factor {index}.")
+        print(f"❌ No factor explanation sections found for factor {index}.")
+        return "No factor explanation provided."
+        # raise ValueError(f"❌ No factor explanation sections found for factor {index}. Text: {text}")
 
     explanations = []
 
@@ -201,7 +203,7 @@ def get_explanation(element_explanation: str, index: int) -> str:
             explanations.append(cleaned)
 
     if not explanations:
-        raise ValueError(f"❌ No explanation found for factor {index}.")
+        raise ValueError(f"❌ No explanation found for factor {index}. Text: {text}")
 
     return " ".join(explanations).strip()
 
@@ -222,7 +224,7 @@ def check_critical(factors_text: str, index: int) -> bool:
         bool: True if critical, else False.
     """
     # 1) Extract the factor block (handles wrapped lines)
-    block_re = re.compile(rf"(?ms)^\s*{index}\.\s*(.*?)(?=^\s*\d+\.\s|\Z)")
+    block_re = re.compile(rf"(?ms)^\s*{index}\.\s*(.*?)(?=^\s*\d+\.\s|\*Critical|\Z)")
     m = block_re.search(factors_text)
     if not m:
         return False  # factor not found -> not critical
