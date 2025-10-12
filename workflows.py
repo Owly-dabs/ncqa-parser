@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
+from tqdm import tqdm 
 
 from mylib import document, element, standard, io_utils as utils
 
@@ -12,6 +13,38 @@ COLUMNS = [
     "factor_explanation", "factor_critical", "factor_reference",
     "effective_date", "updated_at"
 ]
+
+
+def parse_pdfs_in_dir(dir_path: str, output_csv: str):
+    """
+    Iterates over all PDF files in a directory and processes them
+    using the incremental parser. Appends all parsed data into one CSV file.
+    """
+    dir_path = Path(dir_path)
+    output_csv = Path(output_csv)
+
+    if not dir_path.exists():
+        raise FileNotFoundError(f"Directory not found: {dir_path}")
+
+    pdf_files = sorted([p for p in dir_path.glob("*.pdf")])
+    if not pdf_files:
+        print("⚠️ No PDF files found in directory.")
+        return
+
+    print(f"📚 Found {len(pdf_files)} PDF files to process in '{dir_path}'")
+    print(f"📝 Output CSV: {output_csv}")
+
+    start_time = datetime.now()
+
+    for pdf_path in tqdm(pdf_files, desc="Processing PDFs"):
+        try:
+            parse_pdf_incremental(pdf_path, output_csv)
+        except Exception as e:
+            print(f"❌ Error processing {pdf_path.name}: {e}")
+            continue
+
+    print(f"✅ Completed parsing {len(pdf_files)} PDFs in {datetime.now() - start_time}")
+    print(f"📄 Output saved to: {output_csv}")
 
 
 def parse_pdf_incremental(pdf_path: str, output_csv: str):
