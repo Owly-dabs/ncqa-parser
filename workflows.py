@@ -75,7 +75,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
             elem_data_source = element.get_data_source(elem_body)
             elem_explanation = element.get_explanation(elem_body)
             elem_ref = ', '.join([SOURCE, year, std_index, elem_index])
-            elem_must_pass = element.check_must_pass(elem_body)
+            elem_must_pass = element.check_must_pass(elem_explanation)
             elem_factors = element.element_to_factors(elem_body)
             elem_factors_text = element.get_factors_text(elem_body)
             elem_num_factors = len(elem_factors)
