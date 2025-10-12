@@ -118,10 +118,11 @@ def get_description(factors_text: str, index: int) -> str:
     # --- Extract intro (everything before the first numbered line) ---
     intro_match = re.search(r"(?s)^(.*?)^\s*1\.", factors_text, re.MULTILINE)
     intro = re.sub(r"[:\s]+$", "", intro_match.group(1)).strip() if intro_match else ""
+    intro = intro.replace("\n", " ").replace("  ", " ")
 
     # --- Extract factor-specific line ---
     pattern = re.compile(
-        rf"(?ms)^\s*{index}\.\s*(.*?)(?=^\s*\d+\.\s|\Z)"
+        rf"(?ms)^\s*{index}\.\s*(.*?)(?=^\s*\d+\.\s|\*Critical|\Z)"
     )
     match = pattern.search(factors_text)
     if not match:
@@ -177,7 +178,7 @@ def get_explanation(element_explanation: str, index: int) -> str:
 
     matches = pattern.findall(text)
     if not matches:
-        print(f"❌ No factor explanation sections found for factor {index}.")
+        print(f"❌ No factor explanation found.")
         return "No factor explanation provided."
         # raise ValueError(f"❌ No factor explanation sections found for factor {index}. Text: {text}")
 
@@ -203,7 +204,9 @@ def get_explanation(element_explanation: str, index: int) -> str:
             explanations.append(cleaned)
 
     if not explanations:
-        raise ValueError(f"❌ No explanation found for factor {index}. Text: {text}")
+        print(f"❌ No factor explanation found for index {index}")
+        return "No factor explanation provided."
+        # raise ValueError(f"❌ No explanation found for factor {index}. Text: {text}")
 
     return " ".join(explanations).strip()
 
