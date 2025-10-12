@@ -150,12 +150,13 @@ def get_explanation(element_explanation: str, index: int) -> str:
     Handles:
         Factor 3:
         Factor 2-4:
-        Factor 1,3:
+        Factor 1,3
+        Factors 2, 3
     and excludes any text on the same line as the 'Factor' label
     (e.g., "Program structure" after 'Factor 3:').
 
     Stops capturing at the next factor line, or 'Exceptions'/'Related information' line.
-
+    
     Args:
         element_explanation (str): Full element explanation text.
         index (int): Factor number (e.g., 1, 2, 3...).
@@ -166,34 +167,31 @@ def get_explanation(element_explanation: str, index: int) -> str:
     Raises:
         ValueError: If no matching explanation section is found.
     """
-    # --- Normalize text ---
     text = element_explanation.strip()
 
-    # --- Match all "Factor" sections ---
+    # Match "Factor"/"Factors" blocks (with or without colon)
     pattern = re.compile(
-        r"(?ms)^Factors?\s+([\d,\-–—\s]+):[^\n]*\n(.*?)(?=^Factor\s+\d|^Exceptions|^Related information|\Z)",
+        r"(?ms)^Factors?\s+([\d,\-–—\s]+)(?::[^\n]*)?\n(.*?)(?=^Factors?\s+\d|^Exceptions|^Related information|\Z)",
         re.IGNORECASE,
     )
 
-
     matches = pattern.findall(text)
     if not matches:
-        print(text)
         raise ValueError(f"❌ No factor explanation sections found for factor {index}.")
 
     explanations = []
 
     for factor_spec, content in matches:
-        # Normalize spec (remove whitespace)
+        # Normalize factor spec
         factor_spec = factor_spec.replace(" ", "")
-        # Replace en/em dashes with normal hyphen for uniform parsing
         factor_spec = factor_spec.replace("–", "-").replace("—", "-")
-        
+
         factors = set()
         for part in factor_spec.split(","):
             if "-" in part:
                 start, end = part.split("-")
-                factors.update(range(int(start), int(end) + 1))
+                if start.isdigit() and end.isdigit():
+                    factors.update(range(int(start), int(end) + 1))
             elif part.isdigit():
                 factors.add(int(part))
 
@@ -205,7 +203,6 @@ def get_explanation(element_explanation: str, index: int) -> str:
     if not explanations:
         raise ValueError(f"❌ No explanation found for factor {index}.")
 
-    # Combine all applicable explanation sections
     return " ".join(explanations).strip()
 
 
