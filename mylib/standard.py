@@ -41,6 +41,60 @@ def separate_pages_by_standard(pages: list[str]) -> dict[str, str]:
 
     return {k: v.strip() for k, v in standards.items()}
 
+    
+def separate_pages_by_standard_v2(pages: list[str]) -> dict[str, str]:
+    """
+    Groups PDF pages by standards, checking if a new standard begins on each page
+    by inspecting line[4]. Collates pages until the next standard is found.
+
+    A valid standard page is detected if lines[4] starts with a standard index pattern
+    (e.g., 'QI 1:', 'QI 2.1:', etc.). The standard index and title are extracted from
+    lines[0], while the rest of the text (from line[4:] onward) is merged as body text.
+
+    Args:
+        pages (list[str]): List of page texts (each as a string).
+
+    Returns:
+        dict[str, str]: Mapping of standard titles to combined page content.
+    """
+    standards = {}
+    current_standard = None
+    current_text = []
+
+    # Match pattern like "QI 1:", "QI 2.3A:", "CC 10.2:" etc.
+    standard_pattern = re.compile(r"^[A-Z]{2,4}\s*\d+[A-Z0-9.: -]*:")
+
+    for i, text in enumerate(pages, start=1):
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        if len(lines) < 5:
+            # Skip or log short / blank pages
+            continue
+
+        # Check if lines[4] looks like a new standard
+        line4 = lines[4]
+        new_standard_match = standard_pattern.match(line4)
+
+        if new_standard_match:
+            # If a previous standard exists, finalize it
+            if current_standard:
+                standards[current_standard] = "\n".join(current_text).strip()
+                current_text = []
+
+            # Extract the new standard title from line[0]
+            current_standard = lines[0].strip()
+            # Start body text from line[4] onward
+            current_text.append("\n".join(lines[4:]).strip())
+
+        else:
+            # Same standard continues — just add the page text
+            current_text.append("\n".join(lines[4:]).strip())
+
+    # Add the last standard at end of document
+    if current_standard and current_text:
+        standards[current_standard] = "\n".join(current_text).strip()
+
+    return standards
+
 
 def standard_to_elements(standard_body: str) -> dict[str,str]:
     """
