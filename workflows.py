@@ -44,7 +44,32 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
             elem_ref = ', '.join([SOURCE, year, std_index, elem_index])
             elem_must_pass = element.check_must_pass(elem_body)
             elem_factors = element.element_to_factors(elem_body)
+            elem_factors_text = element.get_factors_text(elem_body)
             elem_num_factors = len(elem_factors)
+
+            if elem_num_factors == 0:
+                rows.append({
+                    "source": SOURCE,
+                    "functional_area": functional_area,
+                    "standard_index": std_index,
+                    "standard_title": std_title,
+                    "element_index": elem_index,
+                    "element_title": elem_title,
+                    "element_scoring": elem_scoring,
+                    "element_data_source": elem_data_source,
+                    "element_must_pass": elem_must_pass,
+                    "element_explanation": elem_explanation,
+                    "element_num_factors": elem_num_factors,
+                    "element_reference": elem_ref,
+                    "factor_index": "",
+                    "factor_title": "",
+                    "factor_description": elem_factors_text,
+                    "factor_explanation": "",
+                    "factor_critical": "",
+                    "factor_reference": elem_ref,
+                    "effective_date": effective_date,
+                    "updated_at": datetime.now().strftime("%Y-%m-%d")
+                })
 
             for fact in elem_factors:
                 rows.append({
@@ -67,7 +92,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
                     "factor_critical": fact.factor_critical,
                     "factor_reference": ', '.join([elem_ref, fact.factor_index]),
                     "effective_date": effective_date,
-                    "updated_at": datetime.now().isoformat()
+                    "updated_at": datetime.now().strftime("%Y-%m-%d")
                 })
 
         # Convert this standard’s data to DataFrame
