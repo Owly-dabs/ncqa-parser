@@ -134,7 +134,10 @@ def format_scoring(scoring_text: str) -> str:
         raise ValueError("❌ No scoring descriptions found after category headers.")
 
     # Find all lines that begin with "The organization" or "No scoring"
-    pattern = re.compile(r"(?m)^(The organization.*|No scoring.*|An average.*)", re.IGNORECASE)
+    pattern = re.compile(
+        r"(?m)^(The organization.*|The description.*|No scoring.*|An average.*|High.*|Medium.*|Low.*)",
+        re.IGNORECASE
+    )
     matches = list(pattern.finditer(desc_block))
 
     if len(matches) < 3:
@@ -217,7 +220,7 @@ def get_explanation(element_body: str) -> str:
     Raises:
         ValueError: If 'Explanation' or the section text is not found.
     """
-    pattern = re.compile(r"(?ms)^Explanation\s*(.*?)^Examples", re.IGNORECASE)
+    pattern = re.compile(r"(?ms)^Explanation\s*(.*?)^Examples\s*\n", re.IGNORECASE)
 
     match = pattern.search(element_body)
     if not match:
