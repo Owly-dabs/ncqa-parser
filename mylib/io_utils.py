@@ -1,4 +1,5 @@
 import fitz
+import pandas as pd
 
 
 def read_pdf_pages(pdf_path) -> list[str]:
@@ -17,3 +18,12 @@ def read_pdf_pages(pdf_path) -> list[str]:
             text = page.get_text("text").strip()
             pages.append(text)
     return pages
+
+    
+def clear_csv(file_path: str, header=False):
+    """
+    Clears a csv file. Leaves the header by default
+    """
+    df = pd.read_csv(file_path, nrows=0)  # read only the header
+    df.to_csv(file_path, index=False)     # overwrite file with just the header
+    print(f"✅ Cleared all rows except header in '{file_path}'")
