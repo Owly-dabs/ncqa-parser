@@ -56,7 +56,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
     functional_area = document.get_functional_area(pages)
     effective_date = document.get_date(pages)
     year = document.get_year_from_date(effective_date)
-    standards = standard.separate_pages_by_standard(pages[1:])
+    standards = standard.separate_pages_by_standard_v2(pages[1:]) #NOTE: v2 is less strict
 
     # Track whether we’ve written the header yet
     write_header = not output_csv.exists()
@@ -71,7 +71,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
         for elem_header, elem_body in elements_dict.items():
             elem_index = element.get_index(elem_header)
             elem_title = element.get_title(elem_header)
-            elem_scoring = element.get_scoring(elem_body)
+            elem_scoring = element.get_scoring(elem_body) 
             elem_data_source = element.get_data_source(elem_body)
             elem_explanation = element.get_explanation(elem_body)
             elem_ref = ', '.join([SOURCE, year, std_index, elem_index])
@@ -96,7 +96,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
                     "element_reference": elem_ref,
                     "factor_index": "",
                     "factor_title": "",
-                    "factor_description": elem_factors_text,
+                    "factor_description": elem_factors_text.replace("\n", " "),
                     "factor_explanation": "",
                     "factor_critical": "",
                     "factor_reference": elem_ref,
