@@ -4,6 +4,8 @@ import json
 
 from mylib.datamodels import Factor
 from mylib import factor
+from mylib.logs import logger
+
 
 def get_index(element_header:str) -> str:
     """
@@ -283,7 +285,7 @@ def element_to_factors(element_body:str) -> list[Factor]:
     element_factors = get_factors_text(element_body)
     num_factors = factor.get_num_factors(element_factors)
     if num_factors == 0:
-        print(f"No factors in {element_body[:100]}...")
+        logger.debug(f"No factors in {element_body[:100]}...")
         pass 
     
     factors: list[Factor] = []

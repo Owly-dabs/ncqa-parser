@@ -4,6 +4,8 @@ from pathlib import Path
 from tqdm import tqdm 
 
 from mylib import document, element, standard, io_utils as utils
+from mylib.logs import logger
+
 
 COLUMNS = [
     "source", "functional_area", "standard_index", "standard_title",
@@ -28,11 +30,11 @@ def parse_pdfs_in_dir(dir_path: str, output_csv: str):
 
     pdf_files = sorted([p for p in dir_path.glob("*.pdf")])
     if not pdf_files:
-        print("⚠️ No PDF files found in directory.")
+        logger.warning("⚠️ No PDF files found in directory.")
         return
 
-    print(f"📚 Found {len(pdf_files)} PDF files to process in '{dir_path}'")
-    print(f"📝 Output CSV: {output_csv}")
+    logger.info(f"📚 Found {len(pdf_files)} PDF files to process in '{dir_path}'")
+    logger.info(f"📝 Output CSV: {output_csv}")
 
     start_time = datetime.now()
 
@@ -40,11 +42,11 @@ def parse_pdfs_in_dir(dir_path: str, output_csv: str):
         try:
             parse_pdf_incremental(pdf_path, output_csv)
         except Exception as e:
-            print(f"❌ Error processing {pdf_path.name}: {e}")
+            logger.debug(f"❌ Error processing {pdf_path.name}: {e}")
             continue
 
-    print(f"✅ Completed parsing {len(pdf_files)} PDFs in {datetime.now() - start_time}")
-    print(f"📄 Output saved to: {output_csv}")
+    logger.info(f"✅ Completed parsing {len(pdf_files)} PDFs in {datetime.now() - start_time}")
+    logger.info(f"📄 Output saved to: {output_csv}")
 
 
 def parse_pdf_incremental(pdf_path: str, output_csv: str):
@@ -142,4 +144,4 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
 
         write_header = False  # after first write
 
-        print(f"✅ Written standard {std_index} ({len(rows)} rows) to {output_csv.name}")
+        logger.info(f"✅ Written standard {std_index} ({len(rows)} rows) to {output_csv.name}")

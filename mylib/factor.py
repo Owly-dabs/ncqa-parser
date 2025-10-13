@@ -1,5 +1,7 @@
 import re
 
+from mylib.logs import logger
+
 
 def get_num_factors(factors_text: str) -> int:
     """
@@ -178,7 +180,7 @@ def get_explanation(element_explanation: str, index: int) -> str:
 
     matches = pattern.findall(text)
     if not matches:
-        print(f"❌ No factor explanation found.")
+        logger.debug(f"❌ No factor explanation found.")
         return "No factor explanation provided."
         # raise ValueError(f"❌ No factor explanation sections found for factor {index}. Text: {text}")
 
@@ -201,10 +203,11 @@ def get_explanation(element_explanation: str, index: int) -> str:
         # If current factor applies to the requested index
         if index in factors:
             cleaned = re.sub(r"\s+", " ", content.strip())
+            cleaned = cleaned.replace(";", ".")
             explanations.append(cleaned)
 
     if not explanations:
-        print(f"❌ No factor explanation found for index {index}")
+        logger.debug(f"❌ No factor explanation found for index {index}")
         return "No factor explanation provided."
         # raise ValueError(f"❌ No explanation found for factor {index}. Text: {text}")
 

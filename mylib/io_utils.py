@@ -1,6 +1,8 @@
 import fitz
 import pandas as pd
 
+from mylib.logs import logger
+
 
 def read_pdf_pages(pdf_path) -> list[str]:
     """
@@ -32,4 +34,4 @@ def clear_csv(file_path: str, header=False):
     """
     df = pd.read_csv(file_path, nrows=0)  # read only the header
     df.to_csv(file_path, index=False)     # overwrite file with just the header
-    print(f"✅ Cleared all rows except header in '{file_path}'")
+    logger.info(f"✅ Cleared all rows except header in '{file_path}'")

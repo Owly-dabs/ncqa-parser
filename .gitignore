@@ -1,5 +1,8 @@
-ncqa_2025/
-ncqa_2026/
+ncqa_*/
+edited/
 __pycache__
 .venv
 output.csv
+scra*
+build
+dist
