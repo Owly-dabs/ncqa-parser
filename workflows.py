@@ -18,9 +18,20 @@ COLUMNS = [
 
 
 def parse_pdfs_in_dir(dir_path: str, output_csv: str):
-    """
-    Iterates over all PDF files in a directory and processes them
-    using the incremental parser. Appends all parsed data into one CSV file.
+    """Parse all PDF files in a directory and append data to a CSV file.
+
+    Args:
+        dir_path (str): Path to the directory containing PDF files to process.
+        output_csv (str): Path where the output CSV file will be created/appended.
+
+    Raises:
+        FileNotFoundError: If the specified directory does not exist.
+
+    Returns:
+        None
+
+    Example:
+        >>> parse_pdfs_in_dir("/path/to/pdfs", "output.csv")
     """
     dir_path = Path(dir_path)
     output_csv = Path(output_csv)
@@ -50,6 +61,19 @@ def parse_pdfs_in_dir(dir_path: str, output_csv: str):
 
 
 def parse_pdf_incremental(pdf_path: str, output_csv: str):
+    """Parse a single PDF file incrementally and append data to CSV.
+
+    Args:
+        pdf_path (str): Path to the PDF file to be parsed.
+        output_csv (str): Path to the CSV file where data will be appended.
+
+    Returns:
+        None
+
+    Note:
+        This function uses the v2 parsing method which is less strict than v1,
+        allowing for more flexible parsing of document structures.
+    """
     SOURCE = "NCQA Health Plan Standards"
     pdf_path = Path(pdf_path)
     output_csv = Path(output_csv)
