@@ -1,19 +1,95 @@
-# NCQA PDF Parser
+# 🧩 NCQA Parser
 
-A Python tool for parsing NCQA (National Committee for Quality Assurance) Health Plan Accreditation PDF documents into structured CSV data.
+A lightweight Python CLI that parses NCQA audit PDFs into structured CSV data for analysis and automation.
 
-## Installation and use
-1. Install dependencies
+---
+
+## 🚀 Installation
+
+You can install the CLI directly with a single command — no manual setup needed:
+
 ```bash
-pip install -r requirements.txt
-```
-2. Edit `main.py` with the directory of file path
-3. Run `main.py`
-```bash
-python main.py
+curl -fsSL https://raw.githubusercontent.com/Owly-dabs/ncqa-parser/main/install.sh | sh
 ```
 
-## Columns
+This will:
+
+* Clone the latest version of **ncqa-parser** to `~/.ncqa-parser`
+* Install Python dependencies automatically
+* Add the CLI to your `PATH` (so it’s available globally)
+
+Once complete, restart your terminal or run:
+
+```bash
+source ~/.zshrc   # or ~/.bashrc depending on your shell
+```
+
+---
+
+## 🧰 Usage
+
+Run the CLI from anywhere:
+
+```bash
+ncqa-cli.py [options]
+```
+
+### Example
+
+To parse all NCQA PDFs in a dir:
+```bash
+ncqa-cli.py parse-dir /path/to/pdfs/dir ./output.csv
+```
+
+To parse a single NCQA PDF:
+```bash
+ncqa-cli.py parse-pdf /path/to/ncqa.pdf ./output.csv
+```
+
+---
+
+## 🛠️ Updating
+
+To update to the latest version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Owly-dabs/ncqa-parser/refs/heads/main/install.sh | sh
+```
+
+The installer will detect your existing installation and pull the latest changes.
+
+---
+
+## 🧼 Uninstalling
+
+To remove ncqa-parser completely:
+
+```bash
+rm -rf ~/.ncqa-parser
+```
+
+Then remove the line containing `ncqa-parser` from your shell config file (`.zshrc` or `.bashrc`).
+
+---
+
+## 🧾 Requirements
+
+* Python 3.7 or newer
+* Pip installed
+* Git installed
+* Internet access (for first-time setup)
+
+---
+
+## 💡 Notes
+
+* The tool installs itself under `~/.ncqa-parser` by default.
+* The installer is idempotent — you can rerun it safely anytime.
+* All dependencies are managed via `pip` inside your system Python.
+
+---
+
+## CSV Columns
 * source -- from header
 * functional_area -- title page
 * standard_index -- parse header line
