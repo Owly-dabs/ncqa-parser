@@ -133,6 +133,7 @@ def format_scoring_gpt(scoring_text: str) -> str:
         Concatenate the full description for each category.
         If the description includes the minimum and maximum number of factors needed to meet that category, extract those as integers.
         This may require rearranging the text to find the full description for each category.
+        "No scoring option" is only valid for the 'Partially Met' category. All other categories will have a scoring option.
         This is the text:"""
         + prompt
     )
