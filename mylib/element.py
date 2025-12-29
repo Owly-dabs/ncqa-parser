@@ -320,7 +320,7 @@ def get_factors_text(element_body: str) -> str:
     if element_body.startswith("Not Applicable"):
         return ""
     
-    pattern = re.compile(r"(?ms)^(.*?)(?=^(\*Critical|Scoring))", re.IGNORECASE)
+    pattern = re.compile(r"(?ms)^(.*?)(?=^(\*Critical|Scoring|Summary))", re.IGNORECASE)
     match = pattern.search(element_body)
 
     if not match:
