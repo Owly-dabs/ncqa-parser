@@ -287,9 +287,12 @@ def get_explanation(element_body: str) -> str:
     if element_body.startswith("Not Applicable"):
         return element_body
     
-    pattern = re.compile(r"(?ms)^Explanation\s*(.*?)^Examples\s*\n", re.IGNORECASE)
-
-    match = pattern.search(element_body)
+    pattern_with_example = re.compile(r"(?ms)^Explanation\s*(.*?)^Examples\s*\n")
+    match = pattern_with_example.search(element_body)
+    if not match:
+        logger.warning(f"!! No 'Examples' in ...{element_body[-50:]} \n Taking element body from 'Explanation' onwards")
+        pattern = re.compile(r"(?ms)^Explanation\s*(.*)")
+        match = pattern.search(element_body)
     if not match:
         raise ValueError(f"❌ Could not find 'Explanation' section in element body. Text: {element_body}")
 
