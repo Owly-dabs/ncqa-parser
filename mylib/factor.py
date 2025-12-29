@@ -36,6 +36,7 @@ def get_title(element_explanation: str, factors_text: str, index: int) -> str:
     title: str | None = get_title_from_factors_text(factors_text, index)
     if title: return title
     
+    # logger.warning(f"❌ No title found for factor {index}.")
     raise ValueError(f"❌ No title found for factor {index}.")
 
 
@@ -54,7 +55,7 @@ def get_title_from_explanation(element_explanation: str, index: int) -> str | No
         str | None: The title of the factor, or None if not found.
     """
     # Multiline regex: match a line starting with "Factor {index}:" and capture the title after it
-    pattern = re.compile(rf"(?m)^Factor\s+{index}:\s*(.*)")
+    pattern = re.compile(rf"(?m)^Factor\s+(?:\d+\s*)?{index}:\s*(.*)")
 
     match = pattern.search(element_explanation)
     if not match:
@@ -128,7 +129,9 @@ def get_description(factors_text: str, index: int) -> str:
     )
     match = pattern.search(factors_text)
     if not match:
-        raise ValueError(f"❌ Could not find description for factor {index}.")
+        logger.warning(f"❌ Could not find description for factor {index}.")
+        return "MANUAL REVIEW REQUIRED"
+        # raise ValueError(f"❌ Could not find description for factor {index}.")
 
     # Clean the factor description
     factor_desc = re.sub(r"\s+", " ", match.group(1)).strip()

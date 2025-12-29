@@ -39,7 +39,7 @@ def get_date(pages: list[str]) -> str | None:
         
 def get_year_from_date(date: str) -> str:
     """Return the 4-digit year from an ISO-formatted date string."""
-    return date.split("-")[0]
+    return date.split("-")[0] if date else "2026" # CHANGE THIS BACK
 
 
 def get_functional_area(pages: list[str]) -> str:

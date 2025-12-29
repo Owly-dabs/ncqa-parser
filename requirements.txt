@@ -3,3 +3,5 @@ PyMuPDF==1.23.8
 pydantic==2.11.9
 pandas==2.3.3
 tqdm==4.67.1
+google-genai
+python-dotenv

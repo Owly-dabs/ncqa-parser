@@ -82,7 +82,7 @@ def parse_pdf_incremental(pdf_path: str, output_csv: str):
     functional_area = document.get_functional_area(pages)
     effective_date = document.get_date(pages)
     year = document.get_year_from_date(effective_date)
-    standards = standard.separate_pages_by_standard_v2(pages[1:]) #NOTE: v2 is less strict
+    standards = standard.separate_pages_by_standard_v2(pages) #NOTE: v2 is less strict
 
     # Track whether we’ve written the header yet
     write_header = not output_csv.exists()

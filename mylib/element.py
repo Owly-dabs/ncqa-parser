@@ -71,7 +71,7 @@ def get_scoring(element_body:str) -> str:
         return ""
     
     text = get_scoring_text(element_body)
-    formatted_text = format_scoring(text)
+    formatted_text = format_scoring_gpt(text)
     return formatted_text
 
 
@@ -102,6 +102,52 @@ def get_scoring_text(element_body: str) -> str:
 
     scoring_text = match.group(1).strip()
     return scoring_text
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# The client gets the API key from the environment variable `GEMINI_API_KEY`.
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
+from typing import Optional
+
+client = genai.Client()
+
+class Requirement(BaseModel):
+    description: str = Field(description="The text of the requirement.")
+    min_num_factors: Optional[int] | None = Field(description="Minimum number of factors needed to meet this requirement.")
+    max_num_factors: Optional[int] | None = Field(description="Maximum number of factors needed to meet this requirement.")
+
+class ScoringStructure(BaseModel):
+    met: Requirement = Field(description="Details for the 'Met' scoring category.")
+    partially_met: Requirement = Field(description="Details for the 'Partially Met' scoring category.")
+    not_met: Requirement = Field(description="Details for the 'Not Met' scoring category.")
+
+def format_scoring_gpt(scoring_text: str) -> str:
+    prompt = scoring_text
+    prompt = (
+        """Please extract the 3 scoring requirements from the given text.
+        The text describes three scoring categories: 'Met', 'Partially Met', and 'Not Met'.
+        Concatenate the full description for each category.
+        If the description includes the minimum and maximum number of factors needed to meet that category, extract those as integers.
+        This may require rearranging the text to find the full description for each category.
+        This is the text:"""
+        + prompt
+    )
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_json_schema": ScoringStructure.model_json_schema(),
+        },
+    )
+
+    structured_paragraphs = ScoringStructure.model_validate_json(response.text)
+    return structured_paragraphs.model_dump_json()
 
 
 def format_scoring(scoring_text: str) -> str:
@@ -271,11 +317,11 @@ def get_factors_text(element_body: str) -> str:
     if element_body.startswith("Not Applicable"):
         return ""
     
-    pattern = re.compile(r"(?ms)^(.*?)(?=^Summary of Changes)", re.IGNORECASE)
+    pattern = re.compile(r"(?ms)^(.*?)(?=^(\*Critical|Scoring))", re.IGNORECASE)
     match = pattern.search(element_body)
 
     if not match:
-        raise ValueError("❌ 'Summary of Changes' not found in element body.")
+        raise ValueError("❌ '*Critical' or 'Scoring' not found in element body.")
 
     factors_text = match.group(1).strip()
     return factors_text

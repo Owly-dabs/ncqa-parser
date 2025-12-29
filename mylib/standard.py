@@ -50,6 +50,12 @@ def separate_pages_by_standard_v2(pages: list[str]) -> dict[str, str]:
     A valid standard page is detected if lines[4] starts with a standard index pattern
     (e.g., 'QI 1:', 'QI 2.1:', etc.). The standard index and title are extracted from
     lines[0], while the rest of the text (from line[4:] onward) is merged as body text.
+    
+    There are a few amendable components depending on the structure of the PDF.
+    1. Starting page: 0 or 1?
+    2. What line does the new Standard Title usually appear? 2 or 4?
+    3. What line does the Standard in the header appear? 0 or 1?
+    4. What line does the body text in a page start? 4th line onwards or between the 2nd line and 2nd last line? 
 
     Args:
         pages (list[str]): List of page texts (each as a string).
@@ -64,14 +70,14 @@ def separate_pages_by_standard_v2(pages: list[str]) -> dict[str, str]:
     # Match pattern like "QI 1:", "QI 2.3A:", "CC 10.2:" etc.
     standard_pattern = re.compile(r"^[A-Z]{2,4}\s*\d+[A-Z0-9.: -]*:")
 
-    for i, text in enumerate(pages, start=1):
+    for i, text in enumerate(pages, start=1): # CHANGEABLE
         lines = [line.strip() for line in text.splitlines() if line.strip()]
         if len(lines) < 5:
             # Skip or log short / blank pages
             continue
 
         # Check if lines[4] looks like a new standard
-        line4 = lines[4]
+        line4 = lines[4] # CHANGEABLE
         new_standard_match = standard_pattern.match(line4)
 
         if new_standard_match:
@@ -81,7 +87,7 @@ def separate_pages_by_standard_v2(pages: list[str]) -> dict[str, str]:
                 current_text = []
 
             # Extract the new standard title from line[0]
-            current_standard = lines[0].strip()
+            current_standard = lines[0].strip() #CHANGEABLE
             # Start body text from line[4] onward
             current_text.append("\n".join(lines[4:]).strip())
 
@@ -123,6 +129,11 @@ def standard_to_elements(standard_body: str) -> dict[str,str]:
         start = match.start()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(standard_body)
         element_title = match.group(0).strip()
+        
+        # Remove first letter if double-letter element (usually striked text)
+        if len(element_title.split()[1]) > 2:
+            element_title = "Element " + element_title.split()[1][1:] + ' ' + ' '.join(element_title.split()[2:])
+        
         element_body = standard_body[start + len(element_title):end].strip()
         elements[element_title] = element_body
 
