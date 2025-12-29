@@ -178,7 +178,7 @@ def get_explanation(element_explanation: str, index: int) -> str:
     # Match "Factor"/"Factors" blocks (with or without colon)
     pattern = re.compile(
         r"(?ms)^Factors?\s+([\d,\-–—\s]+)(?::[^\n]*)?\n(.*?)(?=^Factors?\s+\d|^Exceptions?|^Related information|\Z)",
-        re.IGNORECASE,
+        # re.IGNORECASE,
     )
 
     matches = pattern.findall(text)
